@@ -99,7 +99,9 @@ Blockly.Language.inout_digital_read = {
     this.setColour(230);
     this.appendDummyInput("")
 	      .appendTitle("DigitalRead PIN#")
-	      .appendTitle(new Blockly.FieldDropdown(profile.default.digital), "PIN");
+	      .appendTitle(new Blockly.FieldDropdown(profile.default.digital), "PIN")
+	      .appendTitle("type")
+	      .appendTitle(new Blockly.FieldDropdown([["Normal", "INPUT"],  ["Pullup", "INPUT_PULLUP"]]), "TYPE");
     this.setOutput(true, Boolean);
     this.setTooltip('');
   }
@@ -238,7 +240,8 @@ Blockly.Arduino.inout_digital_write = function() {
 
 Blockly.Arduino.inout_digital_read = function() {
   var dropdown_pin = this.getTitleValue('PIN');
-  Blockly.Arduino.setups_['setup_input_'+dropdown_pin] = 'pinMode('+dropdown_pin+', INPUT);';
+  var dropdown_type = this.getTitleValue('TYPE');
+  Blockly.Arduino.setups_['setup_input_'+dropdown_pin] = 'pinMode('+dropdown_pin+', '+dropdown_type+');';
   var code = 'digitalRead('+dropdown_pin+')';
   return [code, Blockly.Arduino.ORDER_ATOMIC];
 };
