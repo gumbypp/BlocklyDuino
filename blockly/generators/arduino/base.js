@@ -62,6 +62,25 @@ Blockly.Language.base_map = {
   }
 };
 
+Blockly.Language.base_random = {
+  category: 'Math',
+  helpUrl: 'https://www.arduino.cc/en/Reference/Random',
+  init: function() {
+    this.setColour(230);
+    this.appendValueInput("MIN", Number)
+        .appendTitle("Random number (Min ")
+        .setCheck(Number);
+    this.appendValueInput("MAX", Number)
+        .appendTitle("Max ")
+        .setCheck(Number);
+    this.appendDummyInput("")
+	      .appendTitle(")");
+    this.setInputsInline(true);
+    this.setOutput(true);
+    this.setTooltip('Generates a random number between Min anx Max.');
+  }
+};
+
 Blockly.Language.inout_buildin_led = {
    category: 'In/Out',
    helpUrl: 'http://arduino.cc/en/Reference/DigitalWrite',
@@ -220,6 +239,14 @@ Blockly.Arduino.base_map = function() {
   var value_num = Blockly.Arduino.valueToCode(this, 'NUM', Blockly.Arduino.ORDER_NONE);
   var value_dmax = Blockly.Arduino.valueToCode(this, 'DMAX', Blockly.Arduino.ORDER_ATOMIC);
   var code = 'map('+value_num+', 0, 1024, 0, '+value_dmax+')';
+  return [code, Blockly.Arduino.ORDER_NONE];
+};
+
+Blockly.Arduino.base_random = function() {
+  var value_min = Blockly.Arduino.valueToCode(this, 'MIN', Blockly.Arduino.ORDER_NONE);
+  var value_max = Blockly.Arduino.valueToCode(this, 'MAX', Blockly.Arduino.ORDER_ATOMIC);
+  Blockly.Arduino.setups_['setup_random'] = 'randomSeed(analogRead(0));';   // assume that A0 is not connected or will give us a random enough value
+  var code = 'random('+value_min+','+value_max+')';
   return [code, Blockly.Arduino.ORDER_NONE];
 };
 
