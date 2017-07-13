@@ -87,8 +87,10 @@ profile["default"] = profile["arduino"];
  * Initialise the database of variable names.
  */
 Blockly.Arduino.init = function() {
-  // Create a dictionary of definitions to be printed before setups.
+  // Create a dictionary of definitions to be printed before definitions2.
   Blockly.Arduino.definitions_ = {};
+  // Create a dictionary of definitions2 to be printed after definitions, but before setups.
+  Blockly.Arduino.definitions2_ = {};
   // Create a dictionary of setups to be printed before the code.
   Blockly.Arduino.setups_ = {};
   
@@ -133,6 +135,12 @@ Blockly.Arduino.finish = function(code) {
       definitions.push(def);
     }
   }
+
+  // Convert the definitions2 dictionary into a list.
+  var definitions2 = [];
+  for (var name in Blockly.Arduino.definitions2_) {
+    definitions2.push(Blockly.Arduino.definitions2_[name]);
+  }
   
   // Convert the setups dictionary into a list.
   var setups = [];
@@ -140,7 +148,7 @@ Blockly.Arduino.finish = function(code) {
     setups.push(Blockly.Arduino.setups_[name]);
   }
   
-  var allDefs = imports.join('\n') + '\n\n' + definitions.join('\n') + '\nvoid setup() \n{\n  '+setups.join('\n  ') + '\n}'+ '\n\n';
+  var allDefs = imports.join('\n') + '\n\n' + definitions.join('\n') + '\n\n' + definitions2.join('\n') + '\nvoid setup() \n{\n  '+setups.join('\n  ') + '\n}'+ '\n\n';
   return allDefs.replace(/\n\n+/g, '\n\n').replace(/\n*$/, '\n\n\n') + code;
 };
 

@@ -169,6 +169,75 @@ Blockly.Language.inout_highlow = {
   }
 };
 
+Blockly.Language.inout_neopixel = {
+  category: 'In/Out',
+  helpUrl: 'https://github.com/adafruit/Adafruit_NeoPixel',
+  init: function() {
+    this.setColour(230);
+    this.appendDummyInput("")
+        .appendTitle("Neopixel")
+    this.appendValueInput("LED_PIN", Number)
+        .appendTitle("LED ")
+        .setCheck(Number);
+    this.appendValueInput("COLOR_R", Number)
+        .appendTitle("Red ")
+        .setCheck(Number);
+    this.appendValueInput("COLOR_G", Number)
+        .appendTitle("Green ")
+        .setCheck(Number);
+    this.appendValueInput("COLOR_B", Number)
+        .appendTitle("Blue ")
+        .setCheck(Number);
+    this.setInputsInline(true);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setTooltip('Turns a Neopixel LED on or off.');
+  }
+};
+
+Blockly.Language.inout_neopixel_clear = {
+  category: 'In/Out',
+  helpUrl: 'https://github.com/adafruit/Adafruit_NeoPixel',
+  init: function() {
+    this.setColour(230);
+    this.appendDummyInput("")
+        .appendTitle("Neopixel clear")
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setTooltip('Turns all Neopixels off.');
+  }
+};
+
+Blockly.Language.inout_neopixel_show = {
+  category: 'In/Out',
+  helpUrl: 'https://github.com/adafruit/Adafruit_NeoPixel',
+  init: function() {
+    this.setColour(230);
+    this.appendDummyInput("")
+        .appendTitle("Neopixel show")
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setTooltip('Shows all set Neopixels.');
+  }
+};
+
+Blockly.Language.inout_neopixel_brightness = {
+  category: 'In/Out',
+  helpUrl: 'https://github.com/adafruit/Adafruit_NeoPixel',
+  init: function() {
+    this.setColour(230);
+    this.appendDummyInput("")
+        .appendTitle("Neopixel")
+    this.appendValueInput("BRIGHTNESS", Number)
+        .appendTitle("brightness ")
+        .setCheck(Number);
+    this.setInputsInline(true);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setTooltip('Change brightness of all set Neopixels.');
+  }
+};
+
 //servo block
 //http://www.seeedstudio.com/depot/emax-9g-es08a-high-sensitive-mini-servo-p-760.html?cPath=170_171
 Blockly.Language.servo_move = {
@@ -293,6 +362,43 @@ Blockly.Arduino.inout_highlow = function() {
   // Boolean values HIGH and LOW.
   var code = (this.getTitleValue('BOOL') == 'HIGH') ? 'HIGH' : 'LOW';
   return [code, Blockly.Arduino.ORDER_ATOMIC];
+};
+
+Blockly.Arduino.inout_neopixel = function() {
+  var led_pin = Blockly.Arduino.valueToCode(this, 'LED_PIN', Blockly.Arduino.ORDER_NONE);
+  var color_red = parseInt(Blockly.Arduino.valueToCode(this, 'COLOR_R', Blockly.Arduino.ORDER_NONE));
+  var color_green = parseInt(Blockly.Arduino.valueToCode(this, 'COLOR_G', Blockly.Arduino.ORDER_NONE));
+  var color_blue = parseInt(Blockly.Arduino.valueToCode(this, 'COLOR_B', Blockly.Arduino.ORDER_NONE));
+  if ((color_red < 0) || (color_red > 100)) color_red = 0;
+  if ((color_green < 0) || (color_green > 100)) color_green = 0;
+  if ((color_blue < 0) || (color_blue > 100)) color_blue = 0;
+  var color = (parseInt(color_red*255/100) << 16) + (parseInt(color_green*255/100) << 8) + parseInt(color_blue*255/100);
+  
+  Blockly.Arduino.definitions_['define_neopixel'] = '#include <Adafruit_NeoPixel.h>\n';
+  Blockly.Arduino.definitions_['var_neopixel'] = 'Adafruit_NeoPixel leds = Adafruit_NeoPixel(150, 4, NEO_GRB + NEO_KHZ800);\n'; // hardcoded to 150 LEDs on pin 4
+  Blockly.Arduino.definitions2_['func_neopixel_clear'] = 'void clearLEDs()\n{\nfor (int i=0; i<150; i++) { leds.setPixelColor(i, 0); }\nleds.show();\n}';
+  Blockly.Arduino.setups_['setup_neopixel'] = 'leds.begin();\nclearLEDs();\n';    
+  
+  var code = 'leds.setPixelColor(' + led_pin + ',' + color.toString() + ');\n'
+  return code;
+};
+
+Blockly.Arduino.inout_neopixel_clear = function() {
+  Blockly.Arduino.definitions2_['func_neopixel_clear'] = 'void clearLEDs()\n{\nfor (int i=0; i<150; i++) { leds.setPixelColor(i, 0); }\nleds.show();\n}';
+
+  return 'clearLEDs();\n';
+};
+
+Blockly.Arduino.inout_neopixel_show = function() {
+  return 'leds.show();\n';
+};
+
+Blockly.Arduino.inout_neopixel_brightness = function() {
+  var brightness = Blockly.Arduino.valueToCode(this, 'BRIGHTNESS', Blockly.Arduino.ORDER_NONE);
+  if ((brightness < 0) || (brightness > 100)) brightness = 0;
+  
+  var code = 'leds.setBrightness(' + parseInt(brightness*255/100).toString() + ');\nleds.show();\n'
+  return code;
 };
 
 /*
